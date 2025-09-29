@@ -1,0 +1,42 @@
+<h2>Register</h2>
+<form (ngSubmit)="register()">
+  <input
+    type="text"
+    placeholder="Name"
+    [ngModel]="name()"
+    (ngModelChange)="name.set($event)"
+    name="name"
+    required
+  />
+  <input
+    type="email"
+    placeholder="Email"
+    [ngModel]="email()"
+    (ngModelChange)="email.set($event)"
+    name="email"
+    required
+  />
+  <input
+    type="password"
+    placeholder="Password"
+    [ngModel]="password()"
+    (ngModelChange)="password.set($event)"
+    name="password"
+    required
+  />
+  <input
+    type="password"
+    placeholder="Confirm Password"
+    [ngModel]="password_confirmation()"
+    (ngModelChange)="password_confirmation.set($event)"
+    name="password_confirmation"
+    required
+  />
+  <button type="submit">Register</button>
+</form>
+
+@if (success()) {
+<p class="success-message">{{ success() }}</p>
+} @else if (error()) {
+<p class="error-message">{{ error() }}</p>
+}

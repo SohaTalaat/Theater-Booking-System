@@ -1,0 +1,29 @@
+<h3>Select Seats</h3>
+<div class="d-flex flex-wrap" style="max-width: 400px">
+  <div
+    *ngFor="let seat of [].constructor(rows * cols); let i = index"
+    (click)="toggleSeat(i + 1)"
+    [class.selected]="selectedSeats().includes(i + 1)"
+    style="
+      width: 40px;
+      height: 40px;
+      margin: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #333;
+      cursor: pointer;
+    "
+  >
+    {{ i + 1 }}
+  </div>
+</div>
+
+<p>Selected Seats: {{ selectedSeats().join(', ') }}</p>
+
+<style>
+  .selected {
+    background-color: green;
+    color: white;
+  }
+</style>

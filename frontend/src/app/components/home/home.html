@@ -1,0 +1,217 @@
+<div class="home-container">
+  <!-- Header -->
+  <nav class="navbar navbar-light bg-white shadow-sm mb-4">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">🎭 Theatre Booking System</span>
+      <div class="d-flex align-items-center">
+        <span class="me-3"
+          >Welcome, <strong>{{ auth.user()?.name }}</strong></span
+        >
+        <button class="btn btn-outline-danger btn-sm" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <!-- Available Shows Section -->
+    <section class="mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Available Shows</h4>
+        </div>
+        <div class="card-body">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            @for (show of showService.shows(); track show.id) {
+            <div class="col">
+              <div
+                class="card h-100 cursor-pointer"
+                [class.border-primary]="selectedShow()?.id === show.id"
+                [class.bg-light]="selectedShow()?.id === show.id"
+                (click)="selectShow(show)"
+                style="cursor: pointer; transition: transform 0.2s"
+                onmouseover="this.style.transform='translateY(-5px)'"
+                onmouseout="this.style.transform='translateY(0)'"
+              >
+                <div class="card-body">
+                  <h5 class="card-title">{{ show.title }}</h5>
+                  <p class="card-text mb-1">
+                    <i class="bi bi-geo-alt"></i> {{ show.theater?.name }}
+                  </p>
+                  <p class="card-text mb-1">
+                    <i class="bi bi-clock"></i> {{ show.show_time | date : 'medium' }}
+                  </p>
+                  <p class="card-text"><i class="bi bi-hourglass"></i> {{ show.duration }} min</p>
+                  <h4 class="text-primary mb-0">{{ show.price }} EGP</h4>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seat Selection Section -->
+    @if (selectedShow()) {
+    <section class="mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0">Select Seats for {{ selectedShow()!.title }}</h4>
+        </div>
+        <div class="card-body">
+          <!-- Legend -->
+          <div class="d-flex justify-content-center gap-4 mb-4">
+            <span><span class="badge bg-success">Available</span></span>
+            <span><span class="badge bg-warning">Booked</span></span>
+            <span><span class="badge bg-primary">Selected</span></span>
+          </div>
+
+          <!-- Seats Grid -->
+          <div class="row row-cols-5 row-cols-sm-8 row-cols-md-10 row-cols-lg-12 g-2">
+            @for (seat of theaterService.selectedTheaterSeats(); track seat.id) {
+            <div class="col">
+              <button
+                class="btn w-100"
+                [class.btn-success]="
+                  seat.status === 'available' && !selectedSeats().includes(seat.id)
+                "
+                [class.btn-warning]="seat.status === 'booked'"
+                [class.btn-primary]="selectedSeats().includes(seat.id)"
+                [disabled]="seat.status === 'booked'"
+                (click)="seat.status === 'available' ? toggleSeat(seat.id) : null"
+              >
+                {{ seat.seat_number }}
+              </button>
+            </div>
+            }
+          </div>
+
+          <!-- Add-ons Section -->
+          <div class="mt-4">
+            <h5 class="mb-3">Add-ons</h5>
+            <div class="row g-3">
+              @for (addon of addonService.addons(); track addon.id) {
+              <div class="col-md-6 col-lg-4">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="mb-0">{{ addon.name }}</h6>
+                        <small class="text-muted">{{ addon.price }} EGP</small>
+                      </div>
+                      <input
+                        type="number"
+                        class="form-control form-control-sm"
+                        style="width: 80px"
+                        min="0"
+                        [value]="selectedAddons().get(addon.id) || 0"
+                        (change)="updateAddonQuantity(addon.id, +$any($event.target).value)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Booking Summary -->
+          <div class="card bg-primary bg-opacity-10 border-primary mt-4">
+            <div class="card-body">
+              <h5 class="card-title text-primary">Booking Summary</h5>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Selected Seats:</span>
+                <strong>{{ selectedSeats().length }}</strong>
+              </div>
+              <div class="d-flex justify-content-between mb-3">
+                <span>Total Cost:</span>
+                <strong class="text-primary fs-4">{{ totalCost() }} EGP</strong>
+              </div>
+              <button
+                class="btn btn-primary w-100 btn-lg"
+                [disabled]="selectedSeats().length === 0"
+                (click)="bookTickets()"
+              >
+                Book Tickets
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    }
+
+    <!-- My Bookings Section -->
+    <section class="mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h4 class="mb-0">My Bookings</h4>
+        </div>
+        <div class="card-body">
+          @if (bookingService.bookings().length === 0) {
+          <div class="alert alert-info text-center" role="alert">
+            No bookings yet. Book your first show now!
+          </div>
+          } @else {
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @for (booking of bookingService.bookings(); track booking.id) {
+            <div class="col">
+              <div class="card h-100" [class.border-danger]="booking.status === 'cancelled'">
+                <div class="card-body">
+                  <h5 class="card-title">{{ booking.show?.title }}</h5>
+                  <p class="card-text mb-1">
+                    <strong>Theater:</strong> {{ booking.show?.theater?.name }}
+                  </p>
+                  <p class="card-text mb-2">
+                    <strong>Show Time:</strong> {{ booking.show?.show_time | date : 'medium' }}
+                  </p>
+                  <div class="mb-2">
+                    <strong>Seats:</strong>
+                    <div class="mt-1">
+                      @for (seat of booking.seats; track seat.id) {
+                      <span class="badge bg-secondary me-1">{{ seat.seat_number }}</span>
+                      }
+                    </div>
+                  </div>
+                  @if (booking.addons && booking.addons.length > 0) {
+                  <div class="mb-2">
+                    <strong>Add-ons:</strong>
+                    <ul class="list-unstyled mb-0 mt-1">
+                      @for (addon of booking.addons; track addon.id) {
+                      <li>
+                        <small>{{ addon.name }} x{{ addon.pivot.quantity }}</small>
+                      </li>
+                      }
+                    </ul>
+                  </div>
+                  }
+                  <hr />
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong class="text-primary">{{ booking.total_cost }} EGP</strong>
+                    <span
+                      class="badge"
+                      [class.bg-success]="booking.status === 'confirmed'"
+                      [class.bg-danger]="booking.status === 'cancelled'"
+                    >
+                      {{ booking.status }}
+                    </span>
+                  </div>
+                  @if (booking.status === 'confirmed') {
+                  <button
+                    class="btn btn-danger btn-sm w-100 mt-3"
+                    (click)="cancelBooking(booking.id)"
+                  >
+                    Cancel Booking
+                  </button>
+                  }
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

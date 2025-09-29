@@ -1,0 +1,85 @@
+<div
+  class="container-fluid vh-100 d-flex align-items-center justify-content-center"
+  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+>
+  <div class="card shadow-lg" style="max-width: 450px; width: 100%">
+    <div class="card-body p-4">
+      <h2 class="card-title text-center mb-4">{{ isRegister() ? 'Register' : 'Login' }}</h2>
+
+      @if (error()) {
+      <div class="alert alert-danger" role="alert">
+        {{ error() }}
+      </div>
+      }
+
+      <form (ngSubmit)="onSubmit()">
+        @if (isRegister()) {
+        <div class="mb-3">
+          <label for="name" class="form-label">Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            [(ngModel)]="name"
+            [ngModelOptions]="{ updateOn: 'change' }"
+            name="name"
+            required
+          />
+        </div>
+        }
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            [(ngModel)]="email"
+            [ngModelOptions]="{ updateOn: 'change' }"
+            name="email"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            [(ngModel)]="password"
+            [ngModelOptions]="{ updateOn: 'change' }"
+            name="password"
+            required
+          />
+        </div>
+
+        @if (isRegister()) {
+        <div class="mb-3">
+          <label for="passwordConfirmation" class="form-label">Confirm Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="passwordConfirmation"
+            [(ngModel)]="passwordConfirmation"
+            [ngModelOptions]="{ updateOn: 'change' }"
+            name="passwordConfirmation"
+            required
+          />
+        </div>
+        }
+
+        <button type="submit" class="btn btn-primary w-100 mb-3" [disabled]="loading()">
+          {{ loading() ? 'Please wait...' : isRegister() ? 'Register' : 'Login' }}
+        </button>
+      </form>
+
+      <p class="text-center mb-0">
+        {{ isRegister() ? 'Already have an account?' : "Don't have an account?" }}
+        <a href="javascript:void(0)" (click)="toggleMode()" class="text-decoration-none fw-bold">
+          {{ isRegister() ? 'Login' : 'Register' }}
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

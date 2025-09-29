@@ -10,11 +10,15 @@ export class Auth {
 
   user = signal<any | null>(null);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient) {}
+
+  async checkAuthStatus(): Promise<any> {
     const saved = localStorage.getItem('user');
 
     if (saved) {
       this.user.set(JSON.parse(saved));
+    } else {
+      this.user.set(null);
     }
   }
 

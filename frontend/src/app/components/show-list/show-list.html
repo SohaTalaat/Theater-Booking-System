@@ -1,0 +1,23 @@
+<div class="container my-5">
+  <h2 class="mb-4">Available Shows</h2>
+  <div class="row">
+    @for (show of showService.shows(); track show.id) {
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ show.title }}</h5>
+          <p class="card-subtitle mb-2 text-muted">{{ show.theater }}</p>
+          <p class="card-text">
+            <span class="badge bg-secondary">{{ show.show_time }}</span>
+          </p>
+          <button class="btn btn-primary mt-3">View Seats</button>
+        </div>
+      </div>
+    </div>
+    } @empty {
+    <div class="col-12">
+      <div class="alert alert-info text-center" role="alert">No shows are currently available.</div>
+    </div>
+    }
+  </div>
+</div>
