@@ -18,12 +18,12 @@ class Seat extends Model
 
     public function theater()
     {
-        $this->belongsTo(Theater::class);
+        return $this->belongsTo(Theater::class);
     }
 
     public function bookings()
     {
-        $this->belongsToMany(Booking::class, 'booking_seat')
+        return $this->belongsToMany(Booking::class, 'booking_seat')
             ->withTimestamps();
     }
 }

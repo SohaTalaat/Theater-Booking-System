@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Http\Resources\AddonResource;
 use App\Models\Addon;
 use App\Http\Controllers\Controller;

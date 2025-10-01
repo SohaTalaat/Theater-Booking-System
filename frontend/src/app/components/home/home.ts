@@ -1,12 +1,13 @@
+import { AddonService } from './../../services/addon';
 import { Booking } from './../../services/booking';
-import { Auth } from './../../services/auth';
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Auth } from '../../services/auth';
 import { ShowService, Show } from '../../services/show';
 import { Theater, Seat } from '../../services/theater';
-import { AddonService, Addon } from '../../services/addon';
+
 @Component({
   selector: 'app-home',
   imports: [CommonModule, FormsModule],
@@ -45,11 +46,13 @@ export class Home implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await Promise.all([
-      this.showService.getShows(),
-      this.addonService.getAddons(),
-      this.bookingService.getBookings(),
-    ]);
+    // Load public data (shows and addons)
+    await Promise.all([this.showService.getShows(), this.addonService.getAddons()]);
+
+    // Load user bookings only if authenticated
+    if (this.auth.user()) {
+      await this.bookingService.getBookings();
+    }
   }
 
   async selectShow(show: Show) {
@@ -82,6 +85,16 @@ export class Home implements OnInit {
   }
 
   async bookTickets() {
+    // Check if user is logged in
+    if (!this.auth.user()) {
+      if (confirm('You need to login to book tickets. Go to login page?')) {
+        this.router.navigate(['/login'], {
+          queryParams: { returnUrl: '/' },
+        });
+      }
+      return;
+    }
+
     const show = this.selectedShow();
     if (!show || this.selectedSeats().length === 0) {
       alert('Please select a show and at least one seat');
@@ -123,6 +136,16 @@ export class Home implements OnInit {
 
   async logout() {
     await this.auth.logOut();
+    // Reload bookings (will be empty after logout)
+    this.bookingService.bookings.set([]);
+    // Stay on home page
+  }
+
+  goToLogin() {
     this.router.navigate(['/login']);
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 }

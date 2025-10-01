@@ -14,14 +14,13 @@ class ShowController extends Controller
      */
     public function index()
     {
-        //
+        return Show::with('theater')->get();
     }
 
 
     public function byTheater($theaterId)
     {
-        return ShowResource::collection(Show::where('theater_id',$theaterId)->get());
-
+        return ShowResource::collection(Show::where('theater_id', $theaterId)->get());
     }
 
     /**
@@ -38,7 +37,7 @@ class ShowController extends Controller
     public function show(string $id)
     {
         return new ShowResource(
-            Show::with('theater')->findOrFail($id)
+            Show::with('theater', 'bookings')->findOrFail($id)
         );
     }
 

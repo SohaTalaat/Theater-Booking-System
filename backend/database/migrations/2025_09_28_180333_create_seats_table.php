@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sears', function (Blueprint $table) {
+        Schema::table('seats', function (Blueprint $table) {
             $table->dropForeign(['theater_id']);
         });
 

@@ -3,11 +3,16 @@
   <nav class="navbar navbar-light bg-white shadow-sm mb-4">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h1">🎭 Theatre Booking System</span>
-      <div class="d-flex align-items-center">
-        <span class="me-3"
+      <div class="d-flex align-items-center gap-2">
+        @if (auth.user()) {
+        <span class="me-2"
           >Welcome, <strong>{{ auth.user()?.name }}</strong></span
         >
         <button class="btn btn-outline-danger btn-sm" (click)="logout()">Logout</button>
+        } @else {
+        <button class="btn btn-outline-primary btn-sm" (click)="goToLogin()">Login</button>
+        <button class="btn btn-primary btn-sm" (click)="goToRegister()">Register</button>
+        }
       </div>
     </div>
   </nav>
@@ -142,6 +147,7 @@
     }
 
     <!-- My Bookings Section -->
+    @if (auth.user()) {
     <section class="mb-4">
       <div class="card shadow-sm">
         <div class="card-header bg-info text-white">
@@ -213,5 +219,6 @@
         </div>
       </div>
     </section>
+    }
   </div>
 </div>

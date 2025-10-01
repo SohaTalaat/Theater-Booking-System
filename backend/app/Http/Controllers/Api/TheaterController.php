@@ -14,7 +14,7 @@ class TheaterController extends Controller
      */
     public function index()
     {
-        return TheaterResource::collection(Theater::all());
+        return TheaterResource::collection(Theater::with(['seats', 'shows'])->get());
     }
 
     /**
@@ -30,8 +30,7 @@ class TheaterController extends Controller
      */
     public function show(string $id)
     {
-        return new TheaterResource
-        (Theater::with(['shows','seats'])->findOrFail($id));
+        return new TheaterResource(Theater::with(['shows', 'seats'])->findOrFail($id));
     }
 
     /**

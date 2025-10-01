@@ -14,7 +14,7 @@ class Theater extends Model
         'location'
     ];
 
-    public function show()
+    public function shows()
     {
         return $this->hasMany(Show::class);
     }

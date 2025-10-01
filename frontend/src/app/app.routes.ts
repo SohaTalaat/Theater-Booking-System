@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './guards/auth-guard';
 import { Home } from './components/home/home';
 import { Login } from './components/login/login';
+import { Register } from './components/register/register';
 
 export const routes: Routes = [
-  { path: '', component: Home, canActivate: [authGuard] },
+  { path: '', component: Home }, // No auth guard - public access
   { path: 'login', component: Login },
+  { path: 'register', component: Register },
+  { path: '**', redirectTo: '' },
 ];

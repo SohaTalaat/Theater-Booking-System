@@ -23,9 +23,9 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function Show()
+    public function show()
     {
-        $this->belongsTo(Show::class);
+        return $this->belongsTo(Show::class);
     }
 
     public function seats()
@@ -34,7 +34,7 @@ class Booking extends Model
             ->withTimestamps();
     }
 
-    public function addOns()
+    public function addons()
     {
         return $this->belongsToMany(Addon::class, 'booking_addon')
             ->withPivot('quantity', 'total_price')
