@@ -27,7 +27,10 @@ export class Theater {
   constructor(private http: HttpClient) {}
 
   async getTheaters() {
-    const theaters = await firstValueFrom(this.http.get<Theater[]>(`${this.apiUrl}/theaters`));
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/theaters`)
+    );
+    const theaters = response.data || response;
     this.theaters.set(theaters);
     return theaters;
   }
@@ -37,7 +40,8 @@ export class Theater {
       ? `${this.apiUrl}/theaters/${theaterId}/seats?show_id=${showId}`
       : `${this.apiUrl}/theaters/${theaterId}/seats`;
 
-    const seats = await firstValueFrom(this.http.get<Seat[]>(url));
+    const response: any = await firstValueFrom(this.http.get(url));
+    const seats = response.data || response;
     this.selectedTheaterSeats.set(seats);
     return seats;
   }

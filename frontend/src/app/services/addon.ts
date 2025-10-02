@@ -18,7 +18,10 @@ export class AddonService {
   constructor(private http: HttpClient) {}
 
   async getAddons() {
-    const addons = await firstValueFrom(this.http.get<Addon[]>(`${this.apiUrl}/addons`));
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/addons`)
+    );
+    const addons = response.data || response;
     this.addons.set(addons);
     return addons;
   }

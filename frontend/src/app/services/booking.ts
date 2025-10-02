@@ -24,9 +24,10 @@ export class Booking {
   constructor(private http: HttpClient) {}
 
   async getBookings() {
-    const bookings = await firstValueFrom(
-      this.http.get<Booking[]>(`${this.apiUrl}/bookings`, { withCredentials: true })
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/bookings`, { withCredentials: true })
     );
+    const bookings = response.data || response;
     this.bookings.set(bookings);
     return bookings;
   }
@@ -36,18 +37,29 @@ export class Booking {
     seat_ids: number[];
     addons?: Array<{ addon_id: number; quantity: number }>;
   }) {
+    // Transform the data to match backend expectations
+    const bookingData = {
+      show_id: data.show_id,
+      seats: data.seat_ids,
+      addons: data.addons?.map(addon => ({
+        id: addon.addon_id,
+        quantity: addon.quantity,
+        total_price: 0 // Will be calculated by backend
+      })),
+      total_cost: 0 // Will be calculated by backend
+    };
+
     const booking = await firstValueFrom(
-      this.http.post<Booking>(`${this.apiUrl}/bookings`, data, { withCredentials: true })
+      this.http.post<Booking>(`${this.apiUrl}/bookings`, bookingData, { withCredentials: true })
     );
     this.bookings.update((bookings) => [...bookings, booking]);
     return booking;
   }
 
   async cancelBooking(id: number) {
-    const booking = await firstValueFrom(
-      this.http.post<Booking>(`${this.apiUrl}/bookings/${id}/cancel`, {}, { withCredentials: true })
+    await firstValueFrom(
+      this.http.delete(`${this.apiUrl}/bookings/${id}`, { withCredentials: true })
     );
-    this.bookings.update((bookings) => bookings.map((b) => (b.id === id ? booking : b)));
-    return booking;
+    this.bookings.update((bookings) => bookings.filter((b) => b.id !== id));
   }
 }

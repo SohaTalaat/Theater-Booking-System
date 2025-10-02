@@ -22,12 +22,19 @@ export class ShowService {
   constructor(private http: HttpClient) {}
 
   async getShows() {
-    const shows = await firstValueFrom(this.http.get<Show[]>(`${this.apiUrl}/shows`));
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/shows`)
+    );
+    // Backend returns raw array, not wrapped in 'data'
+    const shows = Array.isArray(response) ? response : (response.data || response);
     this.shows.set(shows);
     return shows;
   }
 
   async getShow(id: number) {
-    return firstValueFrom(this.http.get<Show>(`${this.apiUrl}/shows/${id}`));
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/shows/${id}`)
+    );
+    return response.data || response;
   }
 }
