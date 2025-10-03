@@ -33,7 +33,7 @@ export class Auth {
     );
 
     const user = await firstValueFrom(
-      this.http.post(`${this.apiUrl}/register`, data, { withCredentials: true })
+      this.http.post(`${this.apiUrl}/api/register`, data, { withCredentials: true })
     );
 
     this.user.set(user);
@@ -47,7 +47,7 @@ export class Auth {
     );
 
     const user = await firstValueFrom(
-      this.http.post(`${this.apiUrl}/login`, credentials, { withCredentials: true })
+      this.http.post(`${this.apiUrl}/api/login`, credentials, { withCredentials: true })
     );
 
     this.user.set(user);
