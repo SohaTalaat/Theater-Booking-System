@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable({
@@ -12,13 +12,23 @@ export class Auth {
 
   constructor(private http: HttpClient) {}
 
-  async checkAuthStatus(): Promise<any> {
-    const saved = localStorage.getItem('user');
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
 
-    if (saved) {
-      this.user.set(JSON.parse(saved));
+  async checkAuthStatus(): Promise<any> {
+    const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+
+    if (savedUser && token) {
+      this.user.set(JSON.parse(savedUser));
+      return JSON.parse(savedUser);
     } else {
       this.user.set(null);
+      return null;
     }
   }
 
@@ -28,46 +38,51 @@ export class Auth {
     password: string;
     password_confirmation: string;
   }) {
-    await firstValueFrom(
-      this.http.get(`${this.apiUrl}/sanctum/csrf-cookie`, { withCredentials: true })
-    );
+    const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}/api/register`, data));
 
-    const user = await firstValueFrom(
-      this.http.post(`${this.apiUrl}/api/register`, data, { withCredentials: true })
-    );
-
-    this.user.set(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    return user;
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    this.user.set(response.user);
+    return response.user;
   }
 
   async login(credentials: { email: string; password: string }) {
-    await firstValueFrom(
-      this.http.get(`${this.apiUrl}/sanctum/csrf-cookie`, { withCredentials: true })
+    const response: any = await firstValueFrom(
+      this.http.post(`${this.apiUrl}/api/login`, credentials)
     );
 
-    const user = await firstValueFrom(
-      this.http.post(`${this.apiUrl}/api/login`, credentials, { withCredentials: true })
-    );
-
-    this.user.set(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    return user;
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    this.user.set(response.user);
+    return response.user;
   }
 
   async getUser() {
-    const user = await firstValueFrom(
-      this.http.get(`${this.apiUrl}/api/user`, { withCredentials: true })
-    );
-
-    this.user.set(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    return user;
+    try {
+      const user: any = await firstValueFrom(
+        this.http.get(`${this.apiUrl}/api/user`, { headers: this.getAuthHeaders() })
+      );
+      this.user.set(user);
+      localStorage.setItem('user', JSON.stringify(user));
+      return user;
+    } catch (err) {
+      this.user.set(null);
+      localStorage.removeItem('user');
+      return null;
+    }
   }
 
   async logOut() {
-    await firstValueFrom(this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }));
-    this.user.set(null);
-    localStorage.removeItem('user');
+    try {
+      await firstValueFrom(
+        this.http.post(`${this.apiUrl}/api/logout`, {}, { headers: this.getAuthHeaders() })
+      );
+    } catch (err) {
+      console.warn('Logout failed', err);
+    } finally {
+      this.user.set(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
   }
 }
