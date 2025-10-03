@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
+use App\Models\Seat;
 
 class BookingController extends Controller
 {
@@ -25,10 +26,13 @@ class BookingController extends Controller
             'total_cost' => $request->total_cost,
         ]);
 
+        // attach seats and update their status
         if ($request->seats) {
             $booking->seats()->attach($request->seats);
+            Seat::whereIn('id', $request->seats)->update(['status' => 'booked']);
         }
 
+        // attach addons
         if ($request->addons) {
             foreach ($request->addons as $addon) {
                 $booking->addons()->attach($addon['id'], [
@@ -50,12 +54,17 @@ class BookingController extends Controller
 
     public function destroy(string $id)
     {
-        $booking = Booking::findOrFail($id);
+        $booking = Booking::with('seats')->findOrFail($id);
+
+        // free the seats
+        $seatIds = $booking->seats->pluck('id')->toArray();
+        Seat::whereIn('id', $seatIds)->update(['status' => 'available']);
+
         $booking->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Booking cancelled successfully'
+            'message' => 'Booking cancelled successfully, seats released'
         ]);
     }
 }

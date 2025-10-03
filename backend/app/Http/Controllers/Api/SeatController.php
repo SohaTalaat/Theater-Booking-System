@@ -1,56 +1,51 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Http\Resources\SeatResource;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\SeatStoreRequest;
+use App\Http\Requests\SeatUpdateRequest;
 use App\Models\Seat;
 
 class SeatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        
-    }
-
     public function byTheater($theaterId)
     {
-        return SeatResource::collection(Seat::where('theater_id',$theaterId)->get());
-
+        return SeatResource::collection(
+            Seat::where('theater_id', $theaterId)->get()
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($id)
     {
-        //
+        return new SeatResource(Seat::findOrFail($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function store(SeatStoreRequest $request)
     {
-        //
+        $seat = Seat::create([
+            'seat_number' => $request->seat_number,
+            'theater_id'  => $request->theater_id,
+            'status'      => 'available',
+        ]);
+
+        return new SeatResource($seat);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(SeatUpdateRequest $request, $id)
     {
-        //
+        $seat = Seat::findOrFail($id);
+        $seat->update($request->only('status'));
+
+        return new SeatResource($seat);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $seat = Seat::findOrFail($id);
+        $seat->delete();
+
+        return response()->json(['message' => 'Seat deleted successfully']);
     }
 }
