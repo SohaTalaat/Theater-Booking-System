@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\TheaterController;
 use App\Http\Controllers\Api\ShowController;
 use App\Http\Controllers\Api\SeatController;
 use App\Http\Controllers\Api\AddonController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
 
 
@@ -39,3 +40,12 @@ Route::post('/bookings', [BookingController::class, 'store']); //create booking
 Route::get('/bookings/{id}', [BookingController::class, 'show']); // booking details
 
 Route::delete('/bookings/{id}', [BookingController::class, 'destroy']);// delete booking
+
+// routes of login and logout
+
+Route::post('/register',[AuthController::class,'register']);
+
+Route::post('/login',[AuthController::class,'login']);
+
+Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+
