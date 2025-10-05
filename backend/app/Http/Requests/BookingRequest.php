@@ -15,10 +15,8 @@ class BookingRequest extends FormRequest
     {
         return [
             'show_id' => ['required', 'integer', 'exists:shows,id'],
-            'seat_id' => ['required', 'integer', 'exists:seats,id'],
-            'booking_date' => ['required', 'date', 'after_or_equal:today'],
-            'time_slot' => ['required', 'string'],
-            'food_package_id' => ['nullable', 'integer', 'exists:food_packages,id'],
+            'seats'      => 'required|array',
+            'total_cost' => 'required|numeric|min:0',
         ];
     }
 }

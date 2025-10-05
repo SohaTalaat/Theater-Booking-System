@@ -22,7 +22,12 @@ class TheaterController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        return new TheaterResource(Theater::create($validated));
     }
 
     /**
@@ -38,7 +43,15 @@ class TheaterController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $theater = Theater::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        $theater->update($validated);
+        return new TheaterResource($theater);
     }
 
     /**
@@ -46,6 +59,7 @@ class TheaterController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Theater::findOrFail($id)->delete();
+        return response()->json(['message' => 'Theater deleted successfully']);
     }
 }

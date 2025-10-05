@@ -28,7 +28,15 @@ class ShowController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'theater_id' => 'required|exists:theaters,id',
+            'title' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'show_time' => 'required|date',
+            'duration' => 'required|integer|min:0',
+        ]);
+
+        return new ShowResource(Show::create($validated));
     }
 
     /**
@@ -46,7 +54,18 @@ class ShowController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $show = Show::findOrFail($id);
+
+        $validated = $request->validate([
+            'theater_id' => 'sometimes|exists:theaters,id',
+            'title' => 'sometimes|string|max:255',
+            'price' => 'sometimes|numeric|min:0',
+            'show_time' => 'sometimes|date',
+            'duration' => 'sometimes|integer|min:0',
+        ]);
+
+        $show->update($validated);
+        return new ShowResource($show);
     }
 
     /**
@@ -54,6 +73,7 @@ class ShowController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Show::findOrFail($id)->delete();
+        return response()->json(['message' => 'Show deleted successfully']);
     }
 }

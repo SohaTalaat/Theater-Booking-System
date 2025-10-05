@@ -22,7 +22,12 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        return new AddonResource(Addon::create($validated));
     }
 
     /**
@@ -38,7 +43,15 @@ class AddonController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $addon = Addon::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'price' => 'sometimes|numeric|min:0',
+        ]);
+
+        $addon->update($validated);
+        return new AddonResource($addon);
     }
 
     /**
@@ -46,6 +59,7 @@ class AddonController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Addon::findOrFail($id)->delete();
+        return response()->json(['message' => 'Addon deleted successfully']);
     }
 }

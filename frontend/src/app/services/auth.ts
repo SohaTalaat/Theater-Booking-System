@@ -6,24 +6,28 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root',
 })
 export class Auth {
-  private apiUrl = 'http://localhost:8000'; //From Laravel Backend
-
+  private apiUrl = 'http://localhost:8000';
+  token = signal<string | null>(null);
   user = signal<any | null>(null);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.checkAuthStatus();
+  }
 
-  private getAuthHeaders(): HttpHeaders {
+  getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     });
   }
 
   async checkAuthStatus(): Promise<any> {
     const savedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    const savedToken = localStorage.getItem('token');
 
-    if (savedUser && token) {
+    if (savedUser && savedToken) {
       this.user.set(JSON.parse(savedUser));
       return JSON.parse(savedUser);
     } else {
@@ -43,6 +47,8 @@ export class Auth {
     localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     this.user.set(response.user);
+    this.token.set(response.token);
+
     return response.user;
   }
 
@@ -54,6 +60,8 @@ export class Auth {
     localStorage.setItem('token', response.token);
     localStorage.setItem('user', JSON.stringify(response.user));
     this.user.set(response.user);
+    this.token.set(response.token);
+
     return response.user;
   }
 
@@ -67,7 +75,9 @@ export class Auth {
       return user;
     } catch (err) {
       this.user.set(null);
+      this.token.set(null);
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
       return null;
     }
   }
@@ -81,8 +91,14 @@ export class Auth {
       console.warn('Logout failed', err);
     } finally {
       this.user.set(null);
+      this.token.set(null);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
+  }
+
+  isAdmin(): boolean {
+    const currentUser = this.user();
+    return currentUser?.role === 'admin';
   }
 }

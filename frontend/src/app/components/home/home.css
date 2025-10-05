@@ -1,8 +1,318 @@
+/* frontend/src/app/components/home/home.css */
+
 .home-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* Modern Navbar */
+.navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-size: 1.5rem !important;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section Cards */
+.card {
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transition: all 0.3s ease;
+}
+
+.card-header {
+  padding: 1.5rem;
+  font-weight: 700;
+  border: none;
+}
+
+.card-header.bg-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.card-header.bg-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+}
+
+.card-header.bg-info {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+/* Show Cards */
 .cursor-pointer {
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.border-primary {
+  border: 3px solid #667eea !important;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3) !important;
+}
+
+.bg-light {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+}
+
+.card-title {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.text-primary {
+  color: #667eea !important;
+  font-weight: 700;
+}
+
+/* Seat Buttons */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Legend Badges */
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.badge.bg-secondary {
+  background: linear-gradient(135deg, #757f9a 0%, #d7dde8 100%) !important;
+}
+
+.badge.bg-danger {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%) !important;
+}
+
+/* Booking Summary Card */
+.bg-primary.bg-opacity-10 {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  ) !important;
+  border: 2px solid rgba(102, 126, 234, 0.3) !important;
+}
+
+.border-primary {
+  border-color: #667eea !important;
+}
+
+/* Add-on Cards */
+.form-control {
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+/* Booking Cards */
+.card.border-danger {
+  border: 3px solid #eb3349 !important;
+  opacity: 0.7;
+}
+
+.card-body hr {
+  margin: 1rem 0;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.5s ease;
+}
+
+/* Icons */
+.bi {
+  font-size: 1rem;
+  margin-right: 0.25rem;
+}
+
+/* Alert */
+.alert {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #e0f7ff 0%, #b3e5fc 100%);
+  color: #01579b;
+}
+
+/* Container */
+.container-fluid {
+  padding: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem !important;
+  }
+
+  .container-fluid {
+    padding: 1rem;
+  }
+
+  .card-header h4 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Button Hover Effects */
+.btn-outline-primary {
+  border: 2px solid #667eea;
+  color: #667eea;
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-danger {
+  border: 2px solid #eb3349;
+  color: #eb3349;
+  background: transparent;
+}
+
+.btn-outline-danger:hover {
+  background: #eb3349;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(235, 51, 73, 0.4);
+}
+
+/* Seat Grid Enhancements */
+.row.g-2 {
+  margin: 0 -0.25rem;
+}
+
+.row.g-2 > .col {
+  padding: 0.25rem;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection Colors */
+::selection {
+  background: #667eea;
+  color: white;
+}
+
+/* Loading State */
+.btn[disabled] {
+  position: relative;
+  cursor: not-allowed;
+}
+
+.btn[disabled]::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

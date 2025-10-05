@@ -14,6 +14,7 @@ export interface Theater {
   name: string;
   location: string;
   seats?: Seat[];
+  shows?: any[];
 }
 
 @Injectable({
@@ -27,9 +28,7 @@ export class Theater {
   constructor(private http: HttpClient) {}
 
   async getTheaters() {
-    const response: any = await firstValueFrom(
-      this.http.get(`${this.apiUrl}/theaters`)
-    );
+    const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}/theaters`));
     const theaters = response.data || response;
     this.theaters.set(theaters);
     return theaters;

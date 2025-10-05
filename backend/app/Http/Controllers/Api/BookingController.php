@@ -7,23 +7,30 @@ use App\Http\Requests\BookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Seat;
+use App\Models\Show;
+use Illuminate\Support\Facades\Auth;
+
 
 class BookingController extends Controller
 {
     public function index()
     {
         return BookingResource::collection(
-            Booking::with(['show', 'seats', 'addons'])->get()
+            Booking::where('user_id', Auth::id())->with(['show.theater', 'seats', 'addons'])->get()
         );
     }
 
     public function store(BookingRequest $request)
     {
+        $show = Show::findOrFail($request->show_id);
+        $seatCount = count($request->seats);
+        $totalCost = $show->price * $seatCount;
+
         $booking = Booking::create([
-            'user_id'    => 1,
+            'user_id'    => Auth::id(),
             'show_id'    => $request->show_id,
             'status'     => 'confirmed',
-            'total_cost' => $request->total_cost,
+            'total_cost' => $totalCost,
         ]);
 
         // attach seats and update their status
@@ -47,9 +54,13 @@ class BookingController extends Controller
 
     public function show(string $id)
     {
-        return new BookingResource(
-            Booking::with(['show', 'seats', 'addons'])->findOrFail($id)
-        );
+        $booking = Booking::with(['show.theater', 'seats', 'addons'])->findOrFail($id);
+
+        if ($booking->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        return new BookingResource($booking);
     }
 
     public function destroy(string $id)

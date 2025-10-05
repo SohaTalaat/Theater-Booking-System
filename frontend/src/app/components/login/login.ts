@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -10,34 +10,45 @@ import { Auth } from '../../services/auth';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login implements OnInit {
+export class Login {
   email = signal('');
   password = signal('');
   error = signal('');
   loading = signal(false);
-  returnUrl = signal('/');
+  isRegister = signal(false);
+  name = signal('');
+  passwordConfirmation = signal('');
 
-  constructor(private auth: Auth, private router: Router, private route: ActivatedRoute) {}
-
-  ngOnInit() {
-    // Get return URL from route parameters or default to '/'
-    this.returnUrl.set(this.route.snapshot.queryParams['returnUrl'] || '/');
-  }
+  constructor(private auth: Auth, private router: Router) {}
 
   async onSubmit() {
     this.error.set('');
     this.loading.set(true);
 
     try {
-      await this.auth.login({
-        email: this.email(),
-        password: this.password(),
-      });
-      this.router.navigate([this.returnUrl()]);
+      if (this.isRegister()) {
+        await this.auth.register({
+          name: this.name(),
+          email: this.email(),
+          password: this.password(),
+          password_confirmation: this.passwordConfirmation(),
+        });
+      } else {
+        await this.auth.login({
+          email: this.email(),
+          password: this.password(),
+        });
+      }
+      this.router.navigate(['/']);
     } catch (err: any) {
-      this.error.set(err.error?.message || 'Login failed');
+      this.error.set(err.error?.message || 'Authentication failed');
     } finally {
       this.loading.set(false);
     }
+  }
+
+  toggleMode() {
+    this.isRegister.update((v) => !v);
+    this.error.set('');
   }
 }

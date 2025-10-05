@@ -1,0 +1,396 @@
+<div class="admin-container">
+  <!-- ========== Sidebar ========== -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">🎭 Admin Panel</h2>
+      <p class="sidebar-subtitle">{{ auth.user()?.name }}</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button
+        class="nav-item"
+        [class.active]="activeTab() === 'theaters'"
+        (click)="activeTab.set('theaters')"
+      >
+        <i class="bi bi-building"></i><span>Theaters</span>
+      </button>
+      <button
+        class="nav-item"
+        [class.active]="activeTab() === 'shows'"
+        (click)="activeTab.set('shows')"
+      >
+        <i class="bi bi-film"></i><span>Shows</span>
+      </button>
+      <button
+        class="nav-item"
+        [class.active]="activeTab() === 'seats'"
+        (click)="activeTab.set('seats')"
+      >
+        <i class="bi bi-grid-3x3"></i><span>Seats</span>
+      </button>
+      <button
+        class="nav-item"
+        [class.active]="activeTab() === 'addons'"
+        (click)="activeTab.set('addons')"
+      >
+        <i class="bi bi-bag-plus"></i><span>Add-ons</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-sidebar btn-secondary" (click)="goHome()">
+        <i class="bi bi-house"></i> Home
+      </button>
+      <button class="btn-sidebar btn-danger" (click)="logout()">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ========== Main Content ========== -->
+  <main class="admin-main">
+    <!-- Alerts -->
+    @if (message()) {
+    <div class="alert-message" [@fadeIn]>
+      {{ message() }}
+      <button class="alert-close" (click)="message.set('')">×</button>
+    </div>
+    }
+
+    <!-- ========== THEATERS TAB ========== -->
+    @if (activeTab() === 'theaters') {
+    <div class="content-section">
+      <div class="section-header">
+        <h1 class="section-title">Manage Theaters</h1>
+        <p class="section-description">Create and manage theater venues</p>
+      </div>
+
+      <div class="form-card">
+        <h3 class="form-title">{{ theaterForm().id ? 'Edit' : 'Add New' }} Theater</h3>
+        <form (ngSubmit)="saveTheater()" class="modern-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Theater Name</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="theaterForm().name"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="e.g., Grand Cinema Hall"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="theaterForm().location"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="e.g., Downtown"
+              />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="loading()">
+              <i class="bi bi-save"></i>
+              {{ loading() ? 'Saving...' : theaterForm().id ? 'Update' : 'Create' }}
+            </button>
+            @if (theaterForm().id) {
+            <button type="button" class="btn btn-secondary" (click)="resetTheaterForm()">
+              Cancel
+            </button>
+            }
+          </div>
+        </form>
+      </div>
+
+      <div class="data-grid">
+        @for (theater of theaterService.theaters(); track theater.id) {
+        <div class="data-card">
+          <div class="card-header">
+            <h4 class="card-title">{{ theater.name }}</h4>
+            <div class="card-actions">
+              <button class="btn-icon btn-edit" (click)="editTheater(theater)" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button
+                class="btn-icon btn-delete"
+                (click)="deleteTheater(theater.id)"
+                title="Delete"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><i class="bi bi-geo-alt"></i> {{ theater.location }}</p>
+            <p><i class="bi bi-film"></i> {{ theater.shows?.length || 0 }} shows</p>
+            <p><i class="bi bi-grid-3x3"></i> {{ theater.seats?.length || 0 }} seats</p>
+          </div>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <i class="bi bi-building"></i>
+          <p>No theaters yet. Create your first one!</p>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- ========== SHOWS TAB ========== -->
+    @if (activeTab() === 'shows') {
+    <div class="content-section">
+      <div class="section-header">
+        <h1 class="section-title">Manage Shows</h1>
+        <p class="section-description">Schedule and manage movie shows</p>
+      </div>
+
+      <div class="form-card">
+        <h3 class="form-title">{{ showForm().id ? 'Edit' : 'Add New' }} Show</h3>
+        <form (ngSubmit)="saveShow()" class="modern-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Theater</label>
+              <select
+                class="form-input"
+                [(ngModel)]="showForm().theater_id"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              >
+                <option value="0">Select Theater</option>
+                @for (theater of theaterService.theaters(); track theater.id) {
+                <option [value]="theater.id">{{ theater.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Title</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="showForm().title"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="e.g., Inception"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Price (EGP)</label>
+              <input
+                type="number"
+                class="form-input"
+                [(ngModel)]="showForm().price"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Show Time</label>
+              <input
+                type="datetime-local"
+                class="form-input"
+                [(ngModel)]="showForm().show_time"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration (minutes)</label>
+              <input
+                type="number"
+                class="form-input"
+                [(ngModel)]="showForm().duration"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="loading()">
+              <i class="bi bi-save"></i>
+              {{ loading() ? 'Saving...' : showForm().id ? 'Update' : 'Create' }}
+            </button>
+            @if (showForm().id) {
+            <button type="button" class="btn btn-secondary" (click)="resetShowForm()">
+              Cancel
+            </button>
+            }
+          </div>
+        </form>
+      </div>
+
+      <div class="data-grid">
+        @for (show of showService.shows(); track show.id) {
+        <div class="data-card">
+          <div class="card-header">
+            <h4 class="card-title">{{ show.title }}</h4>
+            <div class="card-actions">
+              <button class="btn-icon btn-edit" (click)="editShow(show)" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-icon btn-delete" (click)="deleteShow(show.id)" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><i class="bi bi-building"></i> {{ show.theater?.name }}</p>
+            <p><i class="bi bi-clock"></i> {{ show.show_time | date : 'medium' }}</p>
+            <p><i class="bi bi-hourglass"></i> {{ show.duration }} min</p>
+            <p><i class="bi bi-currency-dollar"></i> {{ show.price }} EGP</p>
+          </div>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <i class="bi bi-film"></i>
+          <p>No shows yet. Create your first one!</p>
+        </div>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- ========== SEATS TAB ========== -->
+    @if (activeTab() === 'seats') {
+    <div class="content-section">
+      <div class="section-header">
+        <h1 class="section-title">Manage Seats</h1>
+        <p class="section-description">Create seats in bulk for theaters</p>
+      </div>
+
+      <div class="form-card">
+        <form (ngSubmit)="createBulkSeats()" class="modern-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Theater</label>
+              <select
+                class="form-input"
+                [(ngModel)]="seatForm().theater_id"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              >
+                <option value="0">Select Theater</option>
+                @for (theater of theaterService.theaters(); track theater.id) {
+                <option [value]="theater.id">{{ theater.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Row Letters</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="seatForm().rows"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="ABCDEFGH"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Seats Per Row</label>
+              <input
+                type="number"
+                class="form-input"
+                [(ngModel)]="seatForm().seatsPerRow"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="10"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            Creates {{ seatForm().rows.length }} × {{ seatForm().seatsPerRow }} =
+            <strong>{{ seatForm().rows.length * seatForm().seatsPerRow }}</strong> seats
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="loading()">
+              <i class="bi bi-plus-circle"></i>
+              {{ loading() ? 'Creating...' : 'Create Seats' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    }
+
+    <!-- ========== ADD-ONS TAB ========== -->
+    @if (activeTab() === 'addons') {
+    <div class="content-section">
+      <div class="section-header">
+        <h1 class="section-title">Manage Add-ons</h1>
+        <p class="section-description">Create and manage food & beverage items</p>
+      </div>
+
+      <div class="form-card">
+        <h3 class="form-title">{{ addonForm().id ? 'Edit' : 'Add New' }} Add-on</h3>
+        <form (ngSubmit)="saveAddon()" class="modern-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input
+                type="text"
+                class="form-input"
+                [(ngModel)]="addonForm().name"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Price (EGP)</label>
+              <input
+                type="number"
+                class="form-input"
+                [(ngModel)]="addonForm().price"
+                [ngModelOptions]="{ standalone: true }"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="loading()">
+              <i class="bi bi-save"></i>
+              {{ loading() ? 'Saving...' : addonForm().id ? 'Update' : 'Create' }}
+            </button>
+            @if (addonForm().id) {
+            <button type="button" class="btn btn-secondary" (click)="resetAddonForm()">
+              Cancel
+            </button>
+            }
+          </div>
+        </form>
+      </div>
+
+      <div class="data-grid">
+        @for (addon of addonService.addons(); track addon.id) {
+        <div class="data-card">
+          <div class="card-header">
+            <h4 class="card-title">{{ addon.name }}</h4>
+            <div class="card-actions">
+              <button class="btn-icon btn-edit" (click)="editAddon(addon)" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-icon btn-delete" (click)="deleteAddon(addon.id)" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><i class="bi bi-currency-dollar"></i> {{ addon.price }} EGP</p>
+          </div>
+        </div>
+        } @empty {
+        <div class="empty-state">
+          <i class="bi bi-bag-plus"></i>
+          <p>No add-ons yet. Create your first one!</p>
+        </div>
+        }
+      </div>
+    </div>
+    }
+  </main>
+</div>

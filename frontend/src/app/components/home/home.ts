@@ -47,12 +47,16 @@ export class Home implements OnInit {
 
   async ngOnInit() {
     // Load public data (shows and addons)
-    await Promise.all([this.showService.getShows(), this.addonService.getAddons()]);
+    await Promise.all([
+      this.showService.getShows(),
+      this.addonService.getAddons(),
+      this.bookingService.getBookings(),
+    ]);
 
     // Load user bookings only if authenticated
-    if (this.auth.user()) {
-      await this.bookingService.getBookings();
-    }
+    // if (this.auth.user()) {
+    //   await this.bookingService.getBookings();
+    // }
   }
 
   async selectShow(show: Show) {
