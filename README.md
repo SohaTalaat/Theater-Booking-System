@@ -33,7 +33,7 @@ Built with **Angular** (frontend) and **Laravel** (backend) using **RESTful APIs
 | Layer          | Technology                        |
 | -------------- | --------------------------------- |
 | Frontend       | Angular 20, TypeScript, Bootstrap |
-| Backend        | Laravel 10 (PHP 8+)               |
+| Backend        | Laravel 12 (PHP 8+)               |
 | Database       | MySQL                             |
 | Authentication | Laravel Sanctum                   |
 | API            | RESTful JSON                      |
