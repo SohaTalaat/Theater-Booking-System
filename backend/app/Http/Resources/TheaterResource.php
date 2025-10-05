@@ -15,11 +15,11 @@ class TheaterResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'     =>$this->id,
-            'name'   =>$this->name,
-            'location'=>$this->location,
-            'shows'  =>ShowResource::collection($this->whenLoaded('shows')),
-            'seats'  =>ShowResource::collection($this->whenLoaded('seats')),
+            'id'     => $this->id,
+            'name'   => $this->name,
+            'location' => $this->location,
+            'shows'  => ShowResource::collection($this->whenLoaded('shows')),
+            'seats'  => ShowResource::collection($this->whenLoaded('seats')),
             'created_at' => $this->created_at,
         ];
     }

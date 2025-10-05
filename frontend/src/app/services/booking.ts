@@ -47,9 +47,9 @@ export class Booking {
       addons: data.addons?.map((addon) => ({
         id: addon.addon_id,
         quantity: addon.quantity,
-        total_price: 0, // Will be calculated by backend
+        total_price: 0,
       })),
-      total_cost: 0, // Will be calculated by backend
+      total_cost: 0,
     };
 
     const response: any = await firstValueFrom(

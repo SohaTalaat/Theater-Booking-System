@@ -30,7 +30,9 @@ class SeatController extends Controller
             'status'      => 'available',
         ]);
 
-        return new SeatResource($seat);
+        $seat = new SeatResource($seat);
+
+        return response()->json($seat, 201);
     }
 
     public function update(SeatUpdateRequest $request, $id)

@@ -51,7 +51,7 @@
   <main class="admin-main">
     <!-- Alerts -->
     @if (message()) {
-    <div class="alert-message" [@fadeIn]>
+    <div class="alert-message">
       {{ message() }}
       <button class="alert-close" (click)="message.set('')">×</button>
     </div>

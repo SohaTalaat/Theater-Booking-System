@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -10,45 +10,39 @@ import { Auth } from '../../services/auth';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnInit {
   email = signal('');
   password = signal('');
   error = signal('');
   loading = signal(false);
-  isRegister = signal(false);
-  name = signal('');
-  passwordConfirmation = signal('');
+  returnUrl = signal('/');
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private auth: Auth, private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    // Get return URL from route parameters or default to '/'
+    this.returnUrl.set(this.route.snapshot.queryParams['returnUrl'] || '/');
+  }
 
   async onSubmit() {
     this.error.set('');
     this.loading.set(true);
 
     try {
-      if (this.isRegister()) {
-        await this.auth.register({
-          name: this.name(),
-          email: this.email(),
-          password: this.password(),
-          password_confirmation: this.passwordConfirmation(),
-        });
+      const user = await this.auth.login({
+        email: this.email(),
+        password: this.password(),
+      });
+
+      if (user && user.role === 'admin') {
+        this.router.navigate(['/admin']);
       } else {
-        await this.auth.login({
-          email: this.email(),
-          password: this.password(),
-        });
+        this.router.navigate([this.returnUrl()]);
       }
-      this.router.navigate(['/']);
     } catch (err: any) {
-      this.error.set(err.error?.message || 'Authentication failed');
+      this.error.set(err.error?.message || 'Login failed');
     } finally {
       this.loading.set(false);
     }
-  }
-
-  toggleMode() {
-    this.isRegister.update((v) => !v);
-    this.error.set('');
   }
 }

@@ -42,11 +42,19 @@ class BookingController extends Controller
         // attach addons
         if ($request->addons) {
             foreach ($request->addons as $addon) {
+
+                $addonModel = \App\Models\Addon::findOrFail($addon['id']);
+                $quantity = $addon['quantity'] ?? 1;
+                $addonTotal = $addonModel->price * $quantity;
+
                 $booking->addons()->attach($addon['id'], [
                     'quantity'    => $addon['quantity'],
                     'total_price' => $addon['total_price'],
                 ]);
+                $totalCost += $addonTotal;
             }
+
+            $booking->update(['total_cost' => $totalCost]);
         }
 
         return new BookingResource($booking->load(['show', 'seats', 'addons']));

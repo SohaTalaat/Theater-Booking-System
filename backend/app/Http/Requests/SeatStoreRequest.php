@@ -16,6 +16,8 @@ class SeatStoreRequest extends FormRequest
         return [
             'seat_number' => 'required|string',
             'theater_id'  => 'required|exists:theaters,id',
+            'status' => 'nullable|string',
+
         ];
     }
 }
